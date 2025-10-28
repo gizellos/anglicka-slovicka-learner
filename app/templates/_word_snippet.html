@@ -1,7 +1,13 @@
 <!-- templates/_word_snippet.html – Snippet pro jedno slovíčko (div s detaily) -->
 <div class="word-card mb-3 p-3 border rounded">  <!-- Bootstrap div pro hezký vzhled, mb-3 = margin bottom -->
-    <h5 class="card-title">{{ word.english }} ({{ word.part_of_speech or 'N/A' }})</h5>  <!-- Nadpis: Anglicky + POS -->
+    <div class="word-header d-flex align-items-center mb-3">
+        <h4 class="card-title mb-0 me-2">{{ word.english }}</h4>
+        <em class="fw-lighter mb-0 me-1">{{ word.pronunciation }}</em>
+        <button onclick="playAudio('{{ word.english | safe }}')" class="btn btn-sm btn-outline-primary btn-audio-no-border">🔊</button>
+    </div>
+
     <p><strong>Česky:</strong> {{ word.czech or 'Žádný překlad' }}</p>  <!-- Překlad s fallback -->
+    <p><strong>Slovní druh:</strong> {{ word.part_of_speech or 'N/A' }}</p>  <!-- Typ -->
     <p><strong>Definice:</strong> {{ word.definition or 'Žádná definice' }}</p>  <!-- Definice -->
     <p><strong>Příklad:</strong> {{ word.example or 'Žádný příklad' }}</p>  <!-- Příklad -->
     <p><strong>Znalost:</strong>
@@ -13,5 +19,4 @@
         ({{ word.knowledge_level }})
     </p>  <!-- Podmínka pro knowledge_level -->
     {% if word.synonyms %} <p><strong>Synonyma:</strong> {{ word.synonyms }}</p> {% endif %}  <!-- Volitelně synonyma -->
-    {% if word.pronunciation %}<p><strong>Výslovnost:</strong> {{ word.pronunciation }} <button onclick="playAudio('{{ word.english | safe }}')" class="btn btn-sm btn-outline-primary btn-audio-no-border">🔊</button></p>{% endif %}
 </div>

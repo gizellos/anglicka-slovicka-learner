@@ -1,3 +1,8 @@
+/* posune ikonu trochu dolu */
+.btn-audio-no-border {
+    transform: translateY(2px);
+}
+
 /* Skrytí borderu u audio ikony (pro čistý layout) */
 .btn-audio-no-border {
     border: none !important;  /* Žádný border, !important přebije Bootstrap */
