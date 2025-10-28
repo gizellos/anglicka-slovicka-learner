@@ -57,4 +57,5 @@ instance/
 
 .history/
 static/audio/
+!static/audio/.gitkeep
 temp.py
