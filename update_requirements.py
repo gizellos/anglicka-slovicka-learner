@@ -3,20 +3,22 @@
 # Proč? Aby se závislosti (např. peewee, flask) snadno instalovaly na novém PC (pip install -r).
 # Spusť po instalaci nového modulu (např. pip install flask-login), aby byl seznam aktuální.
 
-import subprocess  # Modul pro spuštění externích příkazů (jako volání pip z Pythonu)
+import subprocess
+import sys
 
-"""Aktualizuje requirements.txt seznamem nainstalovaných balíčků.
+def update_requirements():
+    """Aktualizuje requirements.txt z aktuálního .venv prostředí."""
+    try:
+        # Volání pip freeze přes python modul pro kompatibilitu s .venv
+        result = subprocess.run([sys.executable, '-m', 'pip', 'freeze'],
+                                capture_output=True, text=True, check=True)
+        with open('requirements.txt', 'w', encoding='utf-8') as f:
+            f.write(result.stdout)
+        print("requirements.txt aktualizován úspěšně.")
+    except subprocess.CalledProcessError as e:
+        print(f"Chyba při spuštění pip freeze: {e}")
+    except Exception as e:
+        print(f"Chyba: {e}")
 
-    Args:
-        Žádné (používá aktuální .venv).
-
-    Returns:
-        Žádné (přepíše soubor, vypíše zprávu).
-
-    Notes:
-        pip freeze: Exportuje všechny balíčky (jako 'peewee==3.17.0') do textu.
-        stdout=open('w'): Přesměruje výstup do souboru (w = write, přepíše starý).
-        Proč subprocess? Bezpečnější než os.system – zachytí chyby.
-    """
-subprocess.run(["python", "-m", "pip", "freeze"], stdout=open("requirements.txt", "w"))  # Spusť pip freeze – načte balíčky a zapíše do requirements.txt (přepíše)
-print("requirements.txt aktualizován")  # Potvrzení – vypíše zprávu do konzole
+if __name__ == '__main__':
+    update_requirements()
