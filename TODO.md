@@ -4,6 +4,8 @@ Tento soubor sleduje otevřené úkoly a plánované funkce. Priorita: **Vysoká
 
 ## Vysoká priorita
 - [x] Nastavit databázi: Vytvořit `models.py` s Peewee modely pro slovíčka (slovo, definice, překlad, úroveň, pokrok). Inicializovat SQLite DB v `__init__.py`. (Odhad: 2-3 hodiny) – Hotovo: Model Word s duplicitami pro významy, knowledge_level (0-5), table_name='words', DB 'app.db'.
+- [ ] Vytvořit tabulku v DB, kde budou lekce slovíček. Tabulka bude protojená s tabulkou slovíček a každý lekce bude odkazovat na slovíčka co obsahuje v té tabulce slovíček. Vytvořit na zkoušku 3 lekce. Dvě bez průniku slovíček a jedna s některými slovíčky z obou těch prvních lekcí. Mezi sloupcei bude i sloupec kam se zapisuje to jak moc mám už umím tu lekci.
+- [ ] Přidat stránku Lekce, kde bude seznam těch lekcí. Ty lekce budou klikatelné a dostanou mě na další stránku, kde budou zobrazené ty slovíčka v lekci.
 - [ ] Přidat autentizaci: Implementovat Flask-Login pro registraci/login. Vytvořit model User. (Odhad: 4-5 hodin)
 - [ ] Základní routy pro CRUD slovíček: Přidat `/add_word`, `/edit_word`, `/delete_word` v `routes.py` s WTForms formuláři. (Odhad: 3-4 hodin)
 
