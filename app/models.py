@@ -29,7 +29,6 @@ class Word(BaseModel):
         czech: Český překlad
         definition: Definice z API (delší text)
         pronunciation: Fonetická výslovnost (např. '/həˈloʊ/')
-        audio: URL na audio soubor
         example: Příklad věty se slovem
         synonyms: Synonyma oddělená čárkami (např. 'hi,hallo')
         antonyms: Antonyma oddělená čárkami
@@ -49,7 +48,6 @@ class Word(BaseModel):
     czech = CharField(default='')
     definition = TextField(null=True, default=None)  # Delší text než CharField
     pronunciation = CharField(null=True, default=None)
-    audio = CharField(null=True, default=None)
     example = TextField(null=True, default=None)
     synonyms = TextField(null=True, default=None)
     antonyms = TextField(null=True, default=None)
