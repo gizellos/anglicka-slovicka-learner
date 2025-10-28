@@ -1,40 +1,54 @@
 # app/utils.py
-# Pomocné funkce pro appku – utility pro audio generování atd.
-# Proč oddělený soubor? Aby routes.py zůstal čistý (jen routy), utils pro "pomocníky".
+# Pomocné funkce pro aplikaci.
+# Proč oddělený soubor? Aby routes.py zůstal přehledný – tam jsou jen routy, tady "nástroje".
 
-from gtts import gTTS  # gTTS pro generování MP3 z textu
-from pathlib import Path  # Pro cesty k souborům (standardní Python)
-from flask import url_for, request  # url_for pro static URL, request pro host
-from app.models import Word, db  # Import modelu a DB pro přístup k datům
+from gtts import gTTS
+from pathlib import Path
+from flask import url_for, request
+from app.models import Word, db
 
 def generate_audio_url(word_english):
-    """Generuje US audio MP3 pro slovíčko a vrátí URL.
+    """Vygeneruje MP3 soubor s výslovností slova a vrátí URL k němu.
+
+    Jak to funguje:
+    1. Zkontroluje, jestli MP3 už existuje ve static/audio/
+    2. Pokud ne, použije gTTS (Google Text-to-Speech) pro vytvoření MP3
+    3. Vrátí URL, kterou můžeš použít v <audio> tagu
 
     Args:
-        word_english (str): Anglické slovo (např. 'hello').
+        word_english: Anglické slovo (např. 'hello')
 
     Returns:
-        str: Plná URL k MP3 v static/audio/ nebo None, pokud chyba.
-
-    Notes:
-        Uloží MP3 do static/audio/{word}.mp3 – první volání generuje, další vrátí existující.
-        Lang='en' = US English.
-        Použij request.host_url pro absolutní URL (řeší relativní problémy na Windowsu).
+        str: Plná URL k MP3 (např. 'http://127.0.0.1:5000/static/audio/hello.mp3')
+        None: Pokud se vytvoření nepovedlo
     """
+    # Vytvoř složku static/audio/, pokud neexistuje
+    # Path = moderní způsob práce se soubory v Pythonu (lepší než string cesty)
     audio_dir = Path('static/audio')
-    audio_dir.mkdir(parents=True, exist_ok=True)  # Vytvoř složku (včetně rodičovské 'static')
-    audio_file = audio_dir / f"{word_english}.mp3"
+    audio_dir.mkdir(parents=True, exist_ok=True)  # parents=True vytvoří i 'static', exist_ok=True ignoruje chybu "už existuje"
 
-    if not audio_file.exists():  # Generuj jen pokud neexistuje (ušetří čas)
+    # Cesta k MP3 souboru pro toto slovo
+    audio_file = audio_dir / f"{word_english}.mp3"  # / spojí cestu: static/audio + hello.mp3
+
+    # Pokud MP3 neexistuje, vygeneruj ho
+    if not audio_file.exists():
         try:
-            tts = gTTS(text=word_english, lang='en', slow=False)  # US English, normální rychlost
-            tts.save(str(audio_file))  # Ulož MP3
-            print(f"Audio pro '{word_english}' vygenerováno: {audio_file}")
+            # gTTS vytvoří MP3 z textu
+            # lang='en' = angličtina, slow=False = normální rychlost
+            tts = gTTS(text=word_english, lang='en', slow=False)
+            tts.save(str(audio_file))  # Ulož jako hello.mp3
+            print(f"Audio pro '{word_english}' vytvořeno: {audio_file}")
         except Exception as e:
-            print(f"Chyba generování audio: {e}")
+            # Pokud se něco pokazí (např. žádné internet), vypíše chybu a vrátí None
+            print(f"Chyba při vytváření audio: {e}")
             return None
 
-    # Absolutní URL pro player (host + path)
+    # Vytvoř URL k MP3
+    # url_for('static', filename='...') = Flask funkce pro cestu ke static souborům
     static_path = url_for('static', filename=f"audio/{word_english}.mp3")
+
+    # request.host_url = základ URL (např. 'http://127.0.0.1:5000/')
+    # rstrip('/') odstraní lomítko na konci, pak přidáme static_path
     full_url = request.host_url.rstrip('/') + static_path
-    return full_url
+
+    return full_url  # Vrátí celou URL (např. http://127.0.0.1:5000/static/audio/hello.mp3)

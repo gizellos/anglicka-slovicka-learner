@@ -1,81 +1,70 @@
 # app/models.py
-# Modul pro modely databáze (Peewee ORM) – definuje strukturu tabulek pro slovíčka a uživatele.
-# Proč Peewee? Jednoduché ORM pro SQLite – píšeš Python místo SQL, méně chyb a rychlejší vývoj.
+# Definice databázových modelů pomocí Peewee ORM.
+# Co je ORM? Object-Relational Mapping – píšeš Python třídy místo SQL příkazů.
 
-from peewee import SqliteDatabase, Model, CharField, TextField, IntegerField  # Import Peewee typů pro sloupce
-from datetime import date  # Pro datum last_reviewed (použijeme pro algoritmus opakování – např. spaced repetition)
+from peewee import SqliteDatabase, Model, CharField, TextField, IntegerField
 
-# Připojení k databázi – relativní cesta z kořene projektu (vytvoří soubor 'app.db', pokud neexistuje)
-db = SqliteDatabase('app.db')  # Globální připojení – sdílí se mezi všemi modely (Word, User atd.)
+# Připoj se k databázi
+# SqliteDatabase vytvoří soubor 'app.db', pokud neexistuje
+db = SqliteDatabase('app.db')
 
-# Základní třída pro modely – dědičnost: Všechny modely (Word, User) z ní dědí společné nastavení (jako šablona)
 class BaseModel(Model):
-    """Základní třída pro všechny modely v appce.
+    """Základní třída pro všechny modely.
 
-    Nastavuje společnou databázi (SQLite) a defaulty pro dědící třídy.
-    Proč dědičnost? Aby se nastavení (např. database) neopakovalo v každém modelu.
-
-    Attributes:
-        Meta.database: Připojení k 'app.db' – sdílené pro všechny modely.
+    Všechny modely (Word, User atd.) dědí z této třídy.
+    Proč? Aby všechny automaticky používaly stejnou databázi.
     """
     class Meta:
-        database = db  # Všechny dědící modely používají tuto DB (bezpečnost: jedna DB pro appku)
+        database = db  # Každý model použije app.db
 
-# Model pro slovíčko – reprezentuje jeden záznam (význam slovíčka) v tabulce 'words'
 class Word(BaseModel):
-    """Model pro slovíčko v databázi.
+    """Model pro jedno slovíčko (jeden záznam v tabulce 'words').
 
-    Umožňuje duplicity pro různé významy (např. 'run' jako verb/noun).
-    Používá se pro ukládání dat z API a pokroku učení (knowledge_level 0-5).
-    Proč duplicity? Jazyk má více významů – každý má vlastní definici a znalost.
+    Každý řádek v databázi = jeden Word objekt.
+    Duplicity jsou povolené – např. "run" jako sloveso i podstatné jméno.
 
     Attributes:
-        english (str): Anglické slovo (default prázdné pro bezpečnost při vytváření).
-        part_of_speech (str): Časť řeči (např. 'noun', null=True/volitelné pro flexibilitu).
-        czech (str): Český překlad (povinný, default prázdné).
-        definition (str): Definice z API (volitelné, null=True – fallback v šabloně).
-        pronunciation (str): Fonetická výslovnost z API (volitelné).
-        audio (str): URL na audio výslovnost z API (volitelné – pro přehrání v prohlížeči).
-        example (str): Příklad věty z API (volitelné).
-        synonyms (str): Synonyma jako string s čárkami (např. 'hi,hallo', volitelné – parsuj split(',') v kódu).
-        antonyms (str): Antonyma stejně (volitelné).
-        knowledge_level (int): Úroveň znalosti (0=neučil se, 1=velmi problematické, 5=naučené, default=0 pro nové).
-        correct_count (int): Počet správných odpovědí (pro algoritmus, default=0).
-        wrong_count (int): Počet špatných odpovědí (default=0).
-        last_reviewed (str): Datum posledního zkoušení (např. '2025-10-26', volitelné – pro spaced repetition).
-
-    Meta:
-        table_name: 'words' – plural pro logiku seznamu (default by byl 'word').
+        english: Anglické slovo (např. 'hello')
+        part_of_speech: Slovní druh (např. 'noun', 'verb') – může být prázdné
+        czech: Český překlad
+        definition: Definice z API (delší text)
+        pronunciation: Fonetická výslovnost (např. '/həˈloʊ/')
+        audio: URL na audio soubor
+        example: Příklad věty se slovem
+        synonyms: Synonyma oddělená čárkami (např. 'hi,hallo')
+        antonyms: Antonyma oddělená čárkami
+        knowledge_level: Jak dobře slovo znáš (0=neučil jsem se, 5=perfektně umím)
+        correct_count: Kolikrát jsi odpověděl správně
+        wrong_count: Kolikrát jsi se spletl
+        last_reviewed: Kdy jsi slovo naposledy opakoval (formát 'YYYY-MM-DD')
     """
-    english = CharField(default='')  # Povinný klíč pro hledání – default prázdné pro bezpečnost
-    part_of_speech = CharField(null=True, default=None)  # Volitelné – pro duplicity významů (noun vs. verb)
-    czech = CharField(default='')  # Povinný – default prázdné, abys mohl vytvořit záznam bez chyby
-    definition = TextField(null=True, default=None)  # Volitelné – pro definice z API (delší text)
-    pronunciation = CharField(null=True, default=None)  # Volitelné – fonetika z API
-    audio = CharField(null=True, default=None)  # Volitelné – URL pro zvuk (přidej <audio> v šabloně)
-    example = TextField(null=True, default=None)  # Volitelné – příklad věty z API
-    synonyms = TextField(null=True, default=None)  # Volitelné – string s čárkami (např. 'hi,hallo')
-    antonyms = TextField(null=True, default=None)  # Volitelné – stejně jako synonyms
-    knowledge_level = IntegerField(default=0)  # Klíč pro algoritmus – 0=nové, 5=naučené
-    correct_count = IntegerField(default=0)  # Pro statistiky – počítá správné odpovědi v kvízu
-    wrong_count = IntegerField(default=0)  # Pro statistiky – počítá chyby pro častější opakování
-    last_reviewed = CharField(null=True, default=None)  # Volitelné – datum pro spaced repetition (např. 'YYYY-MM-DD')
+    # CharField = krátký text (max ~255 znaků)
+    # TextField = dlouhý text (tisíce znaků)
+    # IntegerField = celé číslo
+    # null=True = sloupec může být prázdný (None)
+    # default='' = když nevyplníš hodnotu, bude prázdný string místo chyby
+
+    english = CharField(default='')
+    part_of_speech = CharField(null=True, default=None)  # Volitelné – může být None
+    czech = CharField(default='')
+    definition = TextField(null=True, default=None)  # Delší text než CharField
+    pronunciation = CharField(null=True, default=None)
+    audio = CharField(null=True, default=None)
+    example = TextField(null=True, default=None)
+    synonyms = TextField(null=True, default=None)
+    antonyms = TextField(null=True, default=None)
+    knowledge_level = IntegerField(default=0)  # 0-5 škála
+    correct_count = IntegerField(default=0)
+    wrong_count = IntegerField(default=0)
+    last_reviewed = CharField(null=True, default=None)  # Datum jako string
 
     class Meta:
-        table_name = 'words'  # Přejmenuje tabulku z default 'word' na plural 'words' – pro lepší logiku seznamu
+        table_name = 'words'  # Tabulka se bude jmenovat 'words' (ne 'word')
 
-# Funkce pro vytvoření tabulek – volá se při startu appky v __init__.py
 def create_tables():
-    """Vytvoří všechny tabulky v databázi na základě modelů.
+    """Vytvoří tabulky v databázi podle definovaných modelů.
 
-    Args:
-        Žádné (používá globální db z tohoto souboru).
-
-    Returns:
-        Žádné (Peewee to udělá automaticky – vytvoří 'words' tabulku se sloupci).
-
-    Notes:
-        Volá se v app_context() – proč? Aby Peewee věděl o Flask prostředí.
-        Přidej další modely (např. User) do [Word, User] pro automatické vytvoření.
+    Zavolá se při prvním spuštění aplikace v __init__.py.
+    Peewee automaticky převede Python třídy na SQL CREATE TABLE příkazy.
     """
-    db.create_tables([Word])  # Seznam modelů – Peewee vytvoří tabulky podle definic (sloupce, typy)
+    db.create_tables([Word])  # Seznam modelů – přidej sem další (např. User)
