@@ -45,6 +45,7 @@ Po instalaci modulů spusťte `python update_requirements.py`, abyste aktualizov
 - Databáze SQLite bude umístěna v `/home/<uživatel>/mysite/app.db`.
 
 ## Struktura projektu
+```tree
 anglicka-slovicka-learner/
 ├── app/                  # Hlavní modul Flask aplikace
 │   ├── __init__.py       # Tovární funkce create_app() a registrace blueprintů
@@ -61,6 +62,7 @@ anglicka-slovicka-learner/
 ├── TODO.txt              # Věci k dodělání
 ├── update_requirements.py # Skript pro aktualizaci requirements.txt
 └── README.md             # Tento soubor
+```
 
 ## Použité technologie a nástroje
 - **Backend**: Flask (web framework), Peewee (ORM pro SQLite).
