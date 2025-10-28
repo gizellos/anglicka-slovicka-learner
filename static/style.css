@@ -1,0 +1,9 @@
+/* Skrytí borderu u audio ikony (pro čistý layout) */
+.btn-audio-no-border {
+    border: none !important;  /* Žádný border, !important přebije Bootstrap */
+    background: transparent;  /* Průhledné pozadí */
+    padding: 0 5px;  /* Malý padding pro kliknutí */
+}
+.btn-audio-no-border:hover {
+    color: #007bff;  /* Modrý hover pro interaktivitu */
+}

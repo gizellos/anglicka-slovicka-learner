@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+
+{% block title %}Úvod{% endblock %}
+
+{% block content %}
+<p>Ahoj! Toto je úvodní stránka tvé Flask aplikace.</p>
+
+<!-- Zobrazení slovíček z DB (loop s include snippetu) -->
+{% if words %}
+<h2>Tvé slovíčka z databáze:</h2>
+<div class="row">  <!-- Bootstrap grid pro divy v řadě -->
+    {% for word in words %}
+        <div class="col-md-6">  <!-- Každý div v sloupci (responsive) -->
+            {% include '_word_snippet.html' %}  <!-- Vlož snippet pro toto slovíčko -->
+        </div>
+    {% endfor %}
+</div>
+<p>Celkem slovíček: {{ words.count() }}</p>
+{% else %}
+<p>Žádná slovíčka v DB – přidej nějaká!</p>
+{% endif %}
+{% endblock %}

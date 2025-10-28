@@ -1,0 +1,60 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtuální prostředí
+venv/
+env/
+ENV/
+
+# Databáze a migrace
+*.db
+*.sqlite
+*.sqlite3
+migrations/
+
+# IDE/VS Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Flask-specific
+instance/
+.webassets-cache
+*.pyc
+
+# Temp a cache
+*.tmp
+.cache
+
+.history/
+static/audio/
+temp.py

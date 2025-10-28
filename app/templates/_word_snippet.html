@@ -1,0 +1,17 @@
+<!-- templates/_word_snippet.html – Snippet pro jedno slovíčko (div s detaily) -->
+<div class="word-card mb-3 p-3 border rounded">  <!-- Bootstrap div pro hezký vzhled, mb-3 = margin bottom -->
+    <h5 class="card-title">{{ word.english }} ({{ word.part_of_speech or 'N/A' }})</h5>  <!-- Nadpis: Anglicky + POS -->
+    <p><strong>Česky:</strong> {{ word.czech or 'Žádný překlad' }}</p>  <!-- Překlad s fallback -->
+    <p><strong>Definice:</strong> {{ word.definition or 'Žádná definice' }}</p>  <!-- Definice -->
+    <p><strong>Příklad:</strong> {{ word.example or 'Žádný příklad' }}</p>  <!-- Příklad -->
+    <p><strong>Znalost:</strong>
+        {% if word.knowledge_level == 0 %} Neučil se
+        {% elif word.knowledge_level <= 2 %} Problematické
+        {% elif word.knowledge_level <= 4 %} Střední
+        {% else %} Naučené
+        {% endif %}
+        ({{ word.knowledge_level }})
+    </p>  <!-- Podmínka pro knowledge_level -->
+    {% if word.synonyms %} <p><strong>Synonyma:</strong> {{ word.synonyms }}</p> {% endif %}  <!-- Volitelně synonyma -->
+    {% if word.pronunciation %}<p><strong>Výslovnost:</strong> {{ word.pronunciation }} <button onclick="playAudio('{{ word.english | safe }}')" class="btn btn-sm btn-outline-primary btn-audio-no-border">🔊</button></p>{% endif %}
+</div>
