@@ -2,7 +2,8 @@
 # Definice databázových modelů pomocí Peewee ORM.
 # Co je ORM? Object-Relational Mapping – píšeš Python třídy místo SQL příkazů.
 
-from peewee import SqliteDatabase, Model, CharField, TextField, IntegerField
+from peewee import SqliteDatabase, Model, CharField, TextField, IntegerField, DateField, ForeignKeyField, CompositeKey, AutoField
+from datetime import date
 
 # Připoj se k databázi
 # SqliteDatabase vytvoří soubor 'app.db', pokud neexistuje
@@ -24,6 +25,7 @@ class Word(BaseModel):
     Duplicity jsou povolené – např. "run" jako sloveso i podstatné jméno.
 
     Attributes:
+        id: Primární klíč (automaticky generovaný)
         english: Anglické slovo (např. 'hello')
         part_of_speech: Slovní druh (např. 'noun', 'verb') – může být prázdné
         czech: Český překlad
@@ -37,6 +39,7 @@ class Word(BaseModel):
         wrong_count: Kolikrát jsi se spletl
         last_reviewed: Kdy jsi slovo naposledy opakoval (formát 'YYYY-MM-DD')
     """
+    id = AutoField(primary_key=True)  # Explicitní PK pro spolehlivé dotazy na ID
     # CharField = krátký text (max ~255 znaků)
     # TextField = dlouhý text (tisíce znaků)
     # IntegerField = celé číslo
@@ -59,10 +62,44 @@ class Word(BaseModel):
     class Meta:
         table_name = 'words'  # Tabulka se bude jmenovat 'words' (ne 'word')
 
+class Lesson(BaseModel):
+    """Model pro lekci slovíček (tabulka 'lessons').
+
+    Jedna lekce může obsahovat více slovíček přes through model LessonWord.
+    Přístup: lesson.words vrátí QuerySet slovíček (díky backref).
+
+    Attributes:
+        id: Primární klíč (automaticky generovaný)
+        name: Jméno lekce (např. 'Alfa')
+        date: Datum vytvoření lekce
+        progress: Pokrok v lekci (0-100, procenta úspěšnosti)
+    """
+    id = AutoField(primary_key=True)  # Explicitní PK pro spolehlivé dotazy na ID
+    name = CharField()  # Povinné jméno lekce
+    date = DateField(default=date.today)  # Výchozí: dnešní datum
+    progress = IntegerField(default=0)  # 0-100
+
+    class Meta:
+        table_name = 'lessons'
+
+class LessonWord(BaseModel):
+    """Through model pro many-to-many vztah mezi Lesson a Word (tabulka 'lesson_words').
+
+    Propojuje jednu lekci s jedním slovíčkem (unikátní díky CompositeKey).
+    backref='words' na lesson: lesson.words vrátí související slovíčka.
+    backref='lessons' na word: word.lessons vrátí související lekce.
+    """
+    lesson = ForeignKeyField(Lesson, backref='words')
+    word = ForeignKeyField(Word, backref='lessons')
+
+    class Meta:
+        table_name = 'lesson_words'
+        primary_key = CompositeKey('lesson', 'word')  # Unikátní propojení: max jedno slovíčko na lekci
+
 def create_tables():
     """Vytvoří tabulky v databázi podle definovaných modelů.
 
     Zavolá se při prvním spuštění aplikace v __init__.py.
     Peewee automaticky převede Python třídy na SQL CREATE TABLE příkazy.
     """
-    db.create_tables([Word])  # Seznam modelů – přidej sem další (např. User)
+    db.create_tables([Word, Lesson, LessonWord])

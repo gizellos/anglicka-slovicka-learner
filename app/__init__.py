@@ -33,10 +33,7 @@ def create_app():
     # app_context() = "běž tento kód uvnitř Flask aplikace"
     # Proč? Peewee potřebuje vědět, že pracuje s Flask appkou (jinak by nevěděl, kde je databáze)
     with app.app_context():
-        if not os.path.exists(db_path):  # Pokud app.db neexistuje, vytvoř tabulky
-            create_tables()
-            print("Databáze vytvořena poprvé!")
-        else:
-            print("Databáze už existuje – žádné změny.")
+        create_tables()  # Voláno vždy – Peewee přidá chybějící tabulky/sloupce
+        print("Databáze inicializována (tabulky vytvořeny).")
 
     return app  # Vrať hotovou aplikaci – teď ji můžeš spustit přes app.run()
