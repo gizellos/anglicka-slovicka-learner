@@ -4,6 +4,7 @@
 
 from flask import Flask
 from .models import create_tables
+from app.constants import PROJECT_ROOT  # Import PROJECT_ROOT z constants pro centralizaci
 import os
 
 def create_app():
@@ -16,10 +17,9 @@ def create_app():
     # __name__ = 'app' – říká Flasku, kde hledat templates/ a static/
     app = Flask(__name__)
 
-    # Nastav absolutní cestu ke static/ složce
+    # Nastav absolutní cestu ke static/ složce (použití konstanty)
     # Proč? Na Windowsu občas Flask nenajde relativní cestu správně
-    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # Vrátí cestu o úroveň výš (nad app/)
-    app.static_folder = os.path.join(project_root, 'static')  # Spojí cestu: projekt_root + 'static'
+    app.static_folder = os.path.join(PROJECT_ROOT, 'static')  # Spojí cestu: PROJECT_ROOT + 'static'
     app.static_url_path = '/static'  # URL prefix – když napíšeš /static/style.css, Flask ví kam se podívat
 
     # Registruj routy (cesty jako / nebo /quiz)

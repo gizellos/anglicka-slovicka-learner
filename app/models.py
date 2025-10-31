@@ -4,10 +4,10 @@
 
 from peewee import SqliteDatabase, Model, CharField, TextField, IntegerField, DateField, ForeignKeyField, CompositeKey, AutoField
 from datetime import date
+from app.constants import DB_PATH  # Import cesty k DB z constants pro centralizaci
 
-# Připoj se k databázi
-# SqliteDatabase vytvoří soubor 'app.db', pokud neexistuje
-db = SqliteDatabase('app.db')
+# Připoj se k databázi (použití konstanty pro absolutní cestu)
+db = SqliteDatabase(DB_PATH)
 
 class BaseModel(Model):
     """Základní třída pro všechny modely.

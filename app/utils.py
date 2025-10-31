@@ -5,7 +5,7 @@
 from gtts import gTTS
 from pathlib import Path
 from flask import url_for, request
-from app.models import Word, db
+from app.constants import STATIC_AUDIO_DIR, AUDIO_LANG  # Import z constants pro cesty a lang
 
 def generate_audio_url(word_english):
     """Vygeneruje MP3 soubor s výslovností slova a vrátí URL k němu.
@@ -22,20 +22,17 @@ def generate_audio_url(word_english):
         str: Plná URL k MP3 (např. 'http://127.0.0.1:5000/static/audio/hello.mp3')
         None: Pokud se vytvoření nepovedlo
     """
-    # Vytvoř složku static/audio/, pokud neexistuje
-    # Path = moderní způsob práce se soubory v Pythonu (lepší než string cesty)
-    audio_dir = Path('static/audio')
-    audio_dir.mkdir(parents=True, exist_ok=True)  # parents=True vytvoří i 'static', exist_ok=True ignoruje chybu "už existuje"
+    # Vytvoř složku audio/, pokud neexistuje (použití konstanty pro absolutní cestu)
+    Path(STATIC_AUDIO_DIR).mkdir(parents=True, exist_ok=True)
 
-    # Cesta k MP3 souboru pro toto slovo
-    audio_file = audio_dir / f"{word_english}.mp3"  # / spojí cestu: static/audio + hello.mp3
+    # Cesta k MP3 souboru pro toto slovo (přímé spojování Path)
+    audio_file = Path(STATIC_AUDIO_DIR) / f"{word_english}.mp3"
 
     # Pokud MP3 neexistuje, vygeneruj ho
     if not audio_file.exists():
         try:
-            # gTTS vytvoří MP3 z textu
-            # lang='en' = angličtina, slow=False = normální rychlost
-            tts = gTTS(text=word_english, lang='en', slow=False)
+            # gTTS vytvoří MP3 z textu (lang z constants pro snadnou změnu)
+            tts = gTTS(text=word_english, lang=AUDIO_LANG, slow=False)
             tts.save(str(audio_file))  # Ulož jako hello.mp3
             print(f"Audio pro '{word_english}' vytvořeno: {audio_file}")
         except Exception as e:
