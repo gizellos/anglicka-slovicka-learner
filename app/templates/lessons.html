@@ -1,0 +1,22 @@
+{% extends "main.html" %}
+
+{% block title %}Seznam lekcí{% endblock %}
+
+{% block content %}
+<p>Ahoj! Toto je stránka se seznamem lekcí tvé Flask aplikace.</p>
+
+<!-- Zobrazení lekcí z DB (loop s include snippetu) -->
+{% if lessons %}
+<h2>Tvé lekce z databáze:</h2>
+<div class="row">  <!-- Bootstrap grid pro divy v řadě -->
+    {% for lesson in lessons %}
+        <div class="col-md-6">  <!-- Každý div v sloupci (responsive) -->
+            {% include '_lesson_snippet.html' %}  <!-- Vlož snippet pro tuto lekci -->
+        </div>
+    {% endfor %}
+</div>
+<p>Celkem lekcí: {{ lessons.count() }}</p>
+{% else %}
+<p>Žádné lekce v DB – přidej nějaké!</p>
+{% endif %}
+{% endblock %}

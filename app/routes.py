@@ -3,8 +3,7 @@
 # Co je routa? Když napíšeš http://127.0.0.1:5000/ do prohlížeče, Flask spustí funkci pro tu cestu.
 
 from flask import Blueprint, render_template
-from .models import Word
-from .utils import generate_audio_url
+from .models import Word, Lesson
 
 # Blueprint = skupina rout
 # Proč? Aby se daly routy organizovat do modulů (např. 'main' pro úvodní stránky, 'quiz' pro kvízy)
@@ -30,3 +29,22 @@ def index():
     # render_template('soubor.html', promenna=hodnota)
     # V šabloně pak použiješ {{ words }} pro přístup k datům
     return render_template('index.html', words=words)
+
+
+@bp.route('/lessons/')
+def lessons():
+    """Seznam lekcí – zobrazí všechny lekce z databáze.
+
+    Co se stane:
+    1. Lesson.select() načte všechny lekce z tabulky 'lessons'
+    2. render_template() otevře lessons.html a předá mu proměnnou 'lessons'
+    3. Jinja2 v šabloně udělá loop přes lekce a zobrazí je
+
+    Returns:
+        HTML: Vyrenderovaná stránka lessons.html se všemi lekcemi
+    """
+    # Načti všechny lekce z databáze
+    lessons = Lesson.select()
+
+    # Pošli lekce do šablony
+    return render_template('lessons.html', lessons=lessons)

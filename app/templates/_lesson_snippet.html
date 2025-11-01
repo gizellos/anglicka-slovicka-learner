@@ -1,0 +1,17 @@
+<!-- templates/_lesson_snippet.html – Snippet pro jednu lekci (div s detaily) -->
+<div class="lesson-card mb-3 p-3 border rounded">  <!-- Bootstrap div pro hezký vzhled, mb-3 = margin bottom -->
+    <div class="lesson-header d-flex align-items-center mb-3">
+        <h4 class="card-title mb-0 me-2">{{ lesson.name }}</h4>
+        <em class="fw-lighter mb-0 me-1">{{ lesson.date }}</em>
+    </div>
+    <p><strong>Počet slovíček:</strong> {{ lesson.words.count() }}</p>
+    <p><strong>Znalost:</strong>
+        {% if lesson.progress == 0 %} Neučil se
+        {% elif lesson.progress <= 2 %} Problematické
+        {% elif lesson.progress <= 4 %} Střední
+        {% else %} Naučené
+        {% endif %}
+        ({{ lesson.progress }})
+    </p>  <!-- Podmínka pro progress -->
+    {% if lesson.synonyms %} <p><strong>Synonyma:</strong> {{ lesson.synonyms }}</p> {% endif %}  <!-- Volitelně synonyma -->
+</div>
